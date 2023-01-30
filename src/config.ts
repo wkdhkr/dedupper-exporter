@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as os from "os";
 import { parse } from "jsonc-parser";
 
 const config: {
@@ -35,7 +36,7 @@ const config: {
   },
   retry: 3,
   quality: 95,
-  concurrency: 6,
+  concurrency: os.cpus().length,
   extension: "webp",
   headless: true,
   protocol: "http",

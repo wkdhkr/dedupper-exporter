@@ -15,8 +15,8 @@ export type MainViewerState = {
     missing: number;
     view_date: number;
     view_count: number;
+    t1: null;
     /*
-    t1: null,
     t2: null,
     t3: null,
     t4: null,

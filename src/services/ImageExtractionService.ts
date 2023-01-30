@@ -73,8 +73,26 @@ export default class ImageExtractionService {
         porn: 0,
         porn_sexy: 0,
         sexy: 0,
+        t1: 0,
       },
     } as any) as MainViewerState;
+  }
+
+  validateMainViewerState(hash: string, state: MainViewerState) {
+    if (!state.currentImage) {
+      console.warn("image not found. hash = " + hash);
+      return false;
+    }
+    if (state.currentImage.rating < 1) {
+      console.warn("rating is 0. hash = " + hash);
+      return false;
+    }
+    if (state.currentImage.t1) {
+      console.warn("delete flag detected. hash = " + hash);
+      return false;
+    }
+
+    return true;
   }
 
   async isImageProcessed(hash: string) {
@@ -137,18 +155,12 @@ export default class ImageExtractionService {
         this.createDummyMainViewerState(hash),
       );
 
-      if (!state.mainViewer.currentImage) {
-        console.warn("image not found. hash = " + hash);
-        await this.fileService.touch(pb.missed);
-        return;
-      }
-      if (state.mainViewer.currentImage.rating < 1) {
-        console.warn("rating is 0. hash = " + hash);
-        await this.fileService.touch(pb.missed);
-        return;
-      }
-      if (state.mainViewer.currentImage.t1) {
-        console.warn("delete flag detected. hash = " + hash);
+      if (
+        (await this.validateMainViewerState(
+          hash,
+          state.mainViewer,
+        )) === false
+      ) {
         await this.fileService.touch(pb.missed);
         return;
       }
@@ -172,6 +184,8 @@ export default class ImageExtractionService {
         this.fileService.touch(pb.processed);
         console.info("finished. path = " + pb.image);
       } else {
+        // cleaning
+        await this.fileService.delete(pb.image);
         throw new Error("detect invalid image. path = " + pb.image);
       }
     } catch (e) {
@@ -190,7 +204,7 @@ export default class ImageExtractionService {
 
   async validateImage(filePath: string) {
     const stats = await this.fileService.stat(filePath);
-    if (stats && stats.size > 1024 * 1024 * 7) {
+    if (stats && stats.size > 1024 * 7) {
       return true;
     }
     return false;
