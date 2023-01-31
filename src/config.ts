@@ -35,7 +35,7 @@ const config: {
     },
   },
   retry: 3,
-  quality: 95,
+  quality: 90,
   concurrency: os.cpus().length,
   extension: "webp",
   headless: true,

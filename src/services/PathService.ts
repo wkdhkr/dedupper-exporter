@@ -51,14 +51,17 @@ export default class PathService {
         break;
     }
 
+    /*
     const d = new Date(state.currentImage.timestamp);
     // const datePath = d.getFullYear() + (d.getMonth() < 6 ? "h1" : "h2");
-    const datePath = d.getFullYear();
+    const datePath = d.getFullYear() + "/";
+    */
+    const datePath = "";
 
     return [
       "dist/image/",
       config.orientation + "/",
-      `${datePath}/${state.currentImage.rating}/${nsfwType}/${state.currentImage.hash}.${config.extension}`,
+      `${datePath}${state.currentImage.rating}/${nsfwType}/${state.currentImage.hash}.${config.extension}`,
     ].join("");
   }
 

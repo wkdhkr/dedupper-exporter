@@ -195,7 +195,7 @@ export default class ImageExtractionService {
       await this.fileService.delete(pngPath);
 
       if (retry < config.retry) {
-        await this.process(hash, retry + 1);
+        return await this.process(hash, retry + 1);
       }
       console.error("process failed. hash = " + hash);
       throw e;
