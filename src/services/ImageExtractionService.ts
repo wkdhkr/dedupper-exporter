@@ -1,9 +1,8 @@
-import { Stats } from "fs";
-import { mkdir, writeFile } from "fs/promises";
 import PQueue from "p-queue";
 import { Browser, chromium, Page } from "playwright";
 import { singleton } from "tsyringe";
 import { MainViewerState } from "../../types/dedupper.js";
+import { PathBundle } from "../../types/dedupperExporter.js";
 import config from "../config.js";
 import DedupperViewerUtil from "../utils/DedupperViewerUtil.js";
 import FileService from "./FileService.js";
@@ -63,6 +62,7 @@ export default class ImageExtractionService {
       faces: [],
       currentImage: {
         hash,
+        rating: 0,
         timestamp: 0,
         neutral: 0,
         drawing: 0,
@@ -133,6 +133,17 @@ export default class ImageExtractionService {
     return frame;
   }
 
+  createStatusFileContents(state: MainViewerState, pb: PathBundle) {
+    return JSON.stringify(
+      {
+        state: state.currentImage,
+        paths: pb,
+      },
+      null,
+      2,
+    );
+  }
+
   async process(hash: string, retry = 0) {
     let pngPath: string | null = null;
 
@@ -155,13 +166,21 @@ export default class ImageExtractionService {
         this.createDummyMainViewerState(hash),
       );
 
+      const statusFileContents = this.createStatusFileContents(
+        state.mainViewer,
+        pb,
+      );
+
       if (
         (await this.validateMainViewerState(
           hash,
           state.mainViewer,
         )) === false
       ) {
-        await this.fileService.touch(pb.missed);
+        await this.fileService.writeFile(
+          pb.missed,
+          statusFileContents,
+        );
         return;
       }
 
@@ -176,12 +195,12 @@ export default class ImageExtractionService {
       ]);
       pngPath = pb.png;
       await page.screenshot({ path: pb.png, fullPage: true });
-      await this.imageMinService.convertToWebp(pb.png, pb.image);
+      await this.imageMinService.optimize(pb.png, pb.image);
       await this.fileService.delete(pb.png);
       await page.close();
 
       if (await this.validateImage(pb.image)) {
-        this.fileService.touch(pb.processed);
+        this.fileService.writeFile(pb.processed, statusFileContents);
         console.info("finished. path = " + pb.image);
       } else {
         // cleaning

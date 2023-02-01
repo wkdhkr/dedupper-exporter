@@ -1,32 +1,55 @@
 {
   "name": "dedupper-exporter",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "",
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "tsc --build",
+    "clean": "tsc --build --clean",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
     "ts": "npx ts-node",
     "ts-esm": "node --loader ts-node/esm"
   },
+  "bin": {
+    "dedupper-exporter": "bin/cli.js"
+  },
+  "engines": {
+    "node": ">=18.13.0"
+  },
   "author": "wkdhkr",
-  "license": "ISC",
+  "license": "MIT",
   "volta": {
-    "node": "18.13.0"
+    "node": "18.13.0",
+    "pnpm": "7.26.2"
   },
   "dependencies": {
+    "better-sqlite3": "^8.0.1",
+    "commander": "^10.0.0",
+    "guetzli": "https://github.com/funbox/guetzli-bin/tarball/main",
     "imagemin": "^7.0.1",
-    "imagemin-webp": "^6.0.1",
+    "imagemin-webp": "^6.1.0",
     "jsonc-parser": "^3.2.0",
     "p-queue": "^7.3.0",
     "playwright": "^1.30.0",
     "reflect-metadata": "^0.1.13",
+    "sharp": "^0.31.3",
     "tsyringe": "^4.7.0"
   },
+  "pnpm": {
+    "overrides": {
+      "guetzli": "https://github.com/funbox/guetzli-bin/tarball/main"
+    }
+  },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.3",
     "@types/imagemin": "^8.0.0",
     "@types/imagemin-webp": "^7.0.0",
     "@types/node": "^18.11.18",
+    "@types/sharp": "^0.31.1",
     "ts-node": "^10.9.1",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "vitest": "^0.28.3"
   }
 }

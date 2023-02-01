@@ -1,6 +1,7 @@
 import * as path from "path";
 import { singleton } from "tsyringe";
 import { MainViewerState } from "../../types/dedupper";
+import { PathBundle } from "../../types/dedupperExporter";
 import config from "../config.js";
 
 @singleton()
@@ -9,14 +10,20 @@ export default class PathService {
     return `${hash[0] + hash[1]}`;
   }
   createProcessedPath(hash: string) {
-    return `dist/status/processed/${this.createHashPrefix(hash)}/${hash}.txt`;
+    return path.join(
+      config.outputDirPath,
+      `status/processed/${this.createHashPrefix(hash)}/${hash}.txt`,
+    );
   }
 
   createMissedPath(hash: string) {
-    return `dist/status/missed/${this.createHashPrefix(hash)}/${hash}.txt`;
+    return path.join(
+      config.outputDirPath,
+      `status/missed/${this.createHashPrefix(hash)}/${hash}.txt`,
+    );
   }
 
-  createImagePath(state: MainViewerState) {
+  detectNsfwType(state: MainViewerState) {
     const maxNsfwScore = Math.max(
       state.currentImage.neutral,
       state.currentImage.drawing,
@@ -28,7 +35,6 @@ export default class PathService {
       // state.currentImage.porn_sexy,
       state.currentImage.sexy,
     );
-
     let nsfwType = "unknown";
 
     switch (maxNsfwScore) {
@@ -51,21 +57,49 @@ export default class PathService {
         break;
     }
 
-    /*
-    const d = new Date(state.currentImage.timestamp);
-    // const datePath = d.getFullYear() + (d.getMonth() < 6 ? "h1" : "h2");
-    const datePath = d.getFullYear() + "/";
-    */
-    const datePath = "";
-
-    return [
-      "dist/image/",
-      config.orientation + "/",
-      `${datePath}${state.currentImage.rating}/${nsfwType}/${state.currentImage.hash}.${config.extension}`,
-    ].join("");
+    return nsfwType;
   }
 
-  createPathBundle(state: MainViewerState) {
+  replacePathPattern(pattern: string, state: MainViewerState) {
+    const d = new Date(state.currentImage.timestamp);
+    return pattern.replaceAll(
+      "%ORIENTATION%",
+      config.orientation,
+    ).replaceAll(
+      "%NSFW%",
+      this.detectNsfwType(state),
+    ).replaceAll(
+      "%RATING%",
+      `${state.currentImage.rating}`,
+    )
+      .replaceAll(
+        "%YEAR%",
+        `${d.getFullYear()}`,
+      )
+      .replaceAll(
+        "%MONTH%",
+        `${d.getMonth() + 1}`.padStart(2),
+      )
+      .replaceAll(
+        "%HASH%",
+        state.currentImage.hash,
+      );
+  }
+
+  createImagePath(state: MainViewerState) {
+    return path.join(
+      config.outputDirPath,
+      "image/",
+      (this.replacePathPattern(config.dirPattern, state) + "/").replace(
+        /\/\/$/,
+        "/",
+      ),
+      this.replacePathPattern(config.filePattern, state) + "." +
+        config.extension,
+    );
+  }
+
+  createPathBundle(state: MainViewerState): PathBundle {
     const imagePath = this.createImagePath(state);
     return {
       processed: this.createProcessedPath(state.currentImage.hash),

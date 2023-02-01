@@ -172,7 +172,7 @@ dist
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,node,deno
 
-hash.csv
 config.json
 config.jsonc
 dist/
+build/

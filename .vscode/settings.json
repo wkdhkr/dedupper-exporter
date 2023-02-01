@@ -10,5 +10,8 @@
   "[typescript]": {
     "editor.tabSize": 2,
     "editor.insertSpaces": true
+  },
+  "terminal.integrated.env.windows": {
+    "VOLTA_FEATURE_PNPM": "1"
   }
 }

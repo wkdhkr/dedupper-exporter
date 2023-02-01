@@ -13,7 +13,9 @@ class App {
   }
 
   async exec() {
-    const hashes = await this.hashCollectionService.collectHashes();
+    console.log("hello");
+    process.exit();
+    const hashes = await this.hashCollectionService.collectHashesFromDb();
     console.info("hit_count = " + hashes.length);
 
     // this.imageExtractionService.init().then((t) => t.extractImages(hashes));

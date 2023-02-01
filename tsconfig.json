@@ -4,6 +4,13 @@
     "module": "ES2022",
     "moduleResolution": "node",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports": true,
+    "outDir": "build"
+  },
+  "exclude": ["vitest.*.ts"],
+  "ts-node": {
+    "experimentalResolver": true,
+    "experimentalSpecifierResolution": "node"
   }
 }

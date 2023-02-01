@@ -20,6 +20,11 @@ export default class FileService {
     return writeFile(filePath, "");
   }
 
+  async writeFile(filePath: string, content: string) {
+    await this.prepareDir(filePath);
+    return writeFile(filePath, content);
+  }
+
   async prepareDir(filePath: string) {
     await this.mkdir(path.dirname(filePath));
   }
