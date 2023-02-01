@@ -13,8 +13,6 @@ class App {
   }
 
   async exec() {
-    console.log("hello");
-    process.exit();
     const hashes = await this.hashCollectionService.collectHashesFromDb();
     console.info("hit_count = " + hashes.length);
 
