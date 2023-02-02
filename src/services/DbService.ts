@@ -4,7 +4,10 @@ import config from "../config.js";
 
 @singleton()
 export default class DbService {
-  db = new Database(config.dbPath, {});
+  db = new Database(config.dbPath, {
+    readonly: true,
+    fileMustExist: true,
+  });
 
   fetchRatedImageHashes(
     orientation: string,
