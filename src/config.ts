@@ -110,7 +110,7 @@ program
       "webp",
       "jpg",
     ]),
-  ).version(process.env.npm_package_version);
+  );
 
 program.parse();
 
